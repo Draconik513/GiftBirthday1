@@ -37,6 +37,7 @@ export default function LovePuzzle() {
       .map((p, i) => ({ ...p, position: i + 1 }))
   );
   const [completed, setCompleted] = useState(false);
+  const [selectedId, setSelectedId] = useState(null); // untuk sentuh swap
 
   const handleDragStart = (e, id) => {
     e.dataTransfer.setData('text/plain', id);
@@ -45,34 +46,36 @@ export default function LovePuzzle() {
   const handleDrop = (e, targetPosition) => {
     e.preventDefault();
     const sourceId = parseInt(e.dataTransfer.getData('text/plain'));
+    swapPiecesById(sourceId, targetPosition);
+  };
+
+  const swapPiecesById = (sourceId, targetPosition) => {
     const sourcePiece = pieces.find(p => p.id === sourceId);
     const targetPiece = pieces.find(p => p.position === targetPosition);
 
     if (!sourcePiece) return;
 
-    const updatedPieces = pieces.map(piece => {
-      if (piece.id === sourcePiece.id) {
-        return { ...piece, position: targetPosition };
-      }
-      if (targetPiece && piece.id === targetPiece.id) {
-        return { ...piece, position: sourcePiece.position };
-      }
-      return piece;
+    const updatedPieces = pieces.map(p => {
+      if (p.id === sourcePiece.id) return { ...p, position: targetPosition };
+      if (targetPiece && p.id === targetPiece.id) return { ...p, position: sourcePiece.position };
+      return p;
     });
 
     setPieces(updatedPieces);
+    setSelectedId(null);
+
     const isComplete = updatedPieces.every(p => p.position === p.correctPosition);
     setCompleted(isComplete);
 
     if (isComplete) {
-      const duration = 3 * 1000;
+      const duration = 3000;
       const animationEnd = Date.now() + duration;
       const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
 
       const interval = setInterval(() => {
         const timeLeft = animationEnd - Date.now();
         if (timeLeft <= 0) return clearInterval(interval);
-        
+
         confetti(Object.assign({}, defaults, {
           particleCount: 50,
           origin: { x: Math.random(), y: Math.random() - 0.2 }
@@ -86,7 +89,7 @@ export default function LovePuzzle() {
       <h1 className="text-3xl font-bold text-pink-200 mb-6 text-center">Our Love Puzzle</h1>
 
       <div className="flex flex-col lg:flex-row gap-4 items-start justify-center">
-        {/* Puzzle Grid - Optimized spacing */}
+        {/* Puzzle Grid */}
         <div className="w-full lg:w-auto">
           <div className="grid grid-cols-3 gap-1 sm:gap-2 bg-pink-900/40 p-2 sm:p-3 rounded-xl">
             {[...Array(12)].map((_, i) => {
@@ -96,9 +99,47 @@ export default function LovePuzzle() {
               return (
                 <div
                   key={position}
-                  className="aspect-square bg-pink-800/60 border border-pink-600/50 rounded-lg overflow-hidden"
+                  className={`aspect-square bg-pink-800/60 border border-pink-600/50 rounded-lg overflow-hidden cursor-pointer ${
+                    selectedId === piece?.id ? 'ring-4 ring-pink-400' : ''
+                  }`}
                   onDrop={(e) => handleDrop(e, position)}
                   onDragOver={(e) => e.preventDefault()}
+                  onClick={() => {
+                    if (!piece) return;
+                    if (!selectedId) {
+                      setSelectedId(piece.id);
+                    } else {
+                      const sourcePiece = pieces.find(p => p.id === selectedId);
+                      const targetPiece = piece;
+                      const updatedPieces = pieces.map(p => {
+                        if (p.id === sourcePiece.id) return { ...p, position: targetPiece.position };
+                        if (p.id === targetPiece.id) return { ...p, position: sourcePiece.position };
+                        return p;
+                      });
+
+                      setPieces(updatedPieces);
+                      setSelectedId(null);
+
+                      const isComplete = updatedPieces.every(p => p.position === p.correctPosition);
+                      setCompleted(isComplete);
+
+                      if (isComplete) {
+                        const duration = 3000;
+                        const animationEnd = Date.now() + duration;
+                        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+
+                        const interval = setInterval(() => {
+                          const timeLeft = animationEnd - Date.now();
+                          if (timeLeft <= 0) return clearInterval(interval);
+
+                          confetti(Object.assign({}, defaults, {
+                            particleCount: 50,
+                            origin: { x: Math.random(), y: Math.random() - 0.2 }
+                          }));
+                        }, 250);
+                      }
+                    }
+                  }}
                 >
                   {piece && (
                     <img
@@ -115,14 +156,14 @@ export default function LovePuzzle() {
           </div>
         </div>
 
-        {/* Instructions Panel - More compact */}
+        {/* Instructions Panel */}
         <div className="w-full lg:w-96 bg-pink-900/40 p-4 rounded-xl border border-pink-400/30">
           <h2 className="text-xl sm:text-2xl font-semibold text-pink-200 mb-3">
             Complete Our Love Puzzle
           </h2>
           <p className="text-pink-300 mb-4 text-sm sm:text-base">
-            Drag and drop the puzzle pieces to form a heart shape. 
-            When you complete it, you'll see a special surprise!
+            Drag and drop the puzzle pieces on desktop, or tap two pieces on mobile to swap them!
+            When you complete it, you'll see a special surprise ❤️
           </p>
 
           {completed && (
