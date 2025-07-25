@@ -1,11 +1,11 @@
 
-import { useState, useEffect, useRef } from 'react';
+// src/components/MusicPlayer.jsx
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 
-// Import lagu & cover
+// Lagu & cover
 import song1 from '../assets/sounds/song1.mp3';
 import song2 from '../assets/sounds/song3.mp3';
 import song3 from '../assets/sounds/song2.mp3';
-
 import song1Cover from '../assets/images/song1.jpg';
 import song2Cover from '../assets/images/song2.jpg';
 import song3Cover from '../assets/images/song3.jpg';
@@ -37,55 +37,90 @@ const songs = [
   },
 ];
 
-export default function MusicPlayer() {
+// Context setup
+const MusicContext = createContext();
+export const useMusic = () => useContext(MusicContext);
+
+// Provider
+export const MusicProvider = ({ children }) => {
   const [currentSong, setCurrentSong] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(songs[0].volume);
-  const audioRef = useRef(null);
+  const audioRef = useRef(new Audio(songs[0].file));
 
+  // Volume change
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
+    audioRef.current.volume = volume;
   }, [volume]);
 
+  // Song change
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.load(); // ganti src
-      if (isPlaying) {
-        audioRef.current.play().catch(() => {
-          alert('Tekan tombol Play secara langsung agar audio dapat diputar di iPhone.');
-        });
-      }
+    const audio = audioRef.current;
+    audio.src = songs[currentSong].file;
+    audio.volume = songs[currentSong].volume;
+    if (isPlaying) {
+      audio.play().catch(() => {});
     }
   }, [currentSong]);
 
-  const togglePlay = async () => {
-    if (!audioRef.current) return;
-    try {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      }
-    } catch (err) {
-      console.warn('Gagal play audio:', err);
-      alert('Safari di iPhone mungkin memblokir audio. Coba tekan tombol Play lagi.');
+  // Auto-next on end
+  useEffect(() => {
+    const audio = audioRef.current;
+    const onEnded = () => handleNext();
+    audio.addEventListener('ended', onEnded);
+    return () => audio.removeEventListener('ended', onEnded);
+  }, [currentSong]);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play().catch(() => {});
     }
+    setIsPlaying(!isPlaying);
   };
 
   const handleNext = () => {
-    setIsPlaying(false);
     setCurrentSong((prev) => (prev + 1) % songs.length);
   };
 
   const handlePrev = () => {
-    setIsPlaying(false);
     setCurrentSong((prev) => (prev - 1 + songs.length) % songs.length);
   };
+
+  return (
+    <MusicContext.Provider
+      value={{
+        currentSong,
+        isPlaying,
+        volume,
+        songs,
+        togglePlay,
+        handleNext,
+        handlePrev,
+        setVolume,
+        audioRef,
+      }}
+    >
+      {children}
+    </MusicContext.Provider>
+  );
+};
+
+// Komponen UI player utama
+export default function MusicPlayerUI() {
+  const {
+    currentSong,
+    isPlaying,
+    togglePlay,
+    handleNext,
+    handlePrev,
+    volume,
+    setVolume,
+    songs,
+    audioRef,
+  } = useMusic();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] p-6 bg-gradient-to-br from-pink-900 via-pink-800 to-pink-700 rounded-3xl shadow-2xl border border-pink-400/30 relative overflow-hidden">
@@ -147,13 +182,6 @@ export default function MusicPlayer() {
           />
         </div>
       </div>
-
-      <audio ref={audioRef} onEnded={handleNext}>
-        <source src={songs[currentSong].file} type="audio/mp3" />
-        Your browser does not support the audio element.
-      </audio>
     </div>
   );
 }
-
-
