@@ -1,6 +1,6 @@
 
-import { useState, useEffect } from 'react';
-import useSound from 'use-sound';
+
+import { useState, useEffect, useRef } from 'react';
 
 // Import lagu & cover
 import song1 from '../assets/sounds/song1.mp3';
@@ -11,12 +11,11 @@ import song1Cover from '../assets/images/song1.jpg';
 import song2Cover from '../assets/images/song2.jpg';
 import song3Cover from '../assets/images/song3.jpg';
 
-// Daftar lagu
 const songs = [
   {
-    id: 1,  
-    title: "Massages in the bottle",
-    artist: "Taylor Swift",
+    id: 1,
+    title: 'Massages in the bottle',
+    artist: 'Taylor Swift',
     file: song1,
     volume: 0.7,
     cover: song1Cover,
@@ -24,15 +23,15 @@ const songs = [
   {
     id: 2,
     title: "I Don't Care",
-    artist: "Ed-Sheeran , Justin beiber",
+    artist: 'Ed Sheeran, Justin Bieber',
     file: song2,
     volume: 0.6,
     cover: song2Cover,
   },
   {
     id: 3,
-    title: "Night Changes",
-    artist: "One Direction",
+    title: 'Night Changes',
+    artist: 'One Direction',
     file: song3,
     volume: 0.65,
     cover: song3Cover,
@@ -43,40 +42,39 @@ export default function MusicPlayer() {
   const [currentSong, setCurrentSong] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(songs[0].volume);
+  const audioRef = useRef(null);
 
-  const [play, { pause, stop, sound }] = useSound(songs[currentSong].file, {
-    volume,
-    onend: () => {
-      setIsPlaying(false);
-      handleNext(); // Auto-next setelah selesai
-    },
-  });
-
-  // Hentikan suara saat lagu berubah
   useEffect(() => {
-    if (sound) {
-      sound.stop();
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.load(); // ganti src
+      if (isPlaying) {
+        audioRef.current.play().catch(() => {
+          alert('Tekan tombol Play secara langsung agar audio dapat diputar di iPhone.');
+        });
+      }
     }
   }, [currentSong]);
 
-  useEffect(() => {
-    if (sound) {
-      sound.volume(volume);
-    }
-  }, [volume, sound]);
-
   const togglePlay = async () => {
+    if (!audioRef.current) return;
     try {
       if (isPlaying) {
-        pause();
+        audioRef.current.pause();
         setIsPlaying(false);
       } else {
-        await play(); // ✅ penting buat iOS
+        await audioRef.current.play();
         setIsPlaying(true);
       }
     } catch (err) {
-      console.warn("Pemutaran gagal di iOS:", err);
-      alert("Kalau lagu belum terdengar, coba tekan tombol Play lagi. iPhone mungkin memblokir audio.");
+      console.warn('Gagal play audio:', err);
+      alert('Safari di iPhone mungkin memblokir audio. Coba tekan tombol Play lagi.');
     }
   };
 
@@ -93,7 +91,7 @@ export default function MusicPlayer() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] p-6 bg-gradient-to-br from-pink-900 via-pink-800 to-pink-700 rounded-3xl shadow-2xl border border-pink-400/30 relative overflow-hidden">
 
-      {/* Background blur dari cover */}
+      {/* Background blur */}
       <img
         src={songs[currentSong].cover}
         alt="cover-bg"
@@ -150,7 +148,11 @@ export default function MusicPlayer() {
           />
         </div>
       </div>
+
+      <audio ref={audioRef} onEnded={handleNext}>
+        <source src={songs[currentSong].file} type="audio/mp3" />
+        Your browser does not support the audio element.
+      </audio>
     </div>
   );
 }
-
