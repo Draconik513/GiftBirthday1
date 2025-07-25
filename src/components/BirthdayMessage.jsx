@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import useSound from 'use-sound';
-import birthdaySound from '../assets/sounds/birthday.mp3';
 import FallingText from './FallingText';
 import Confetti from 'react-confetti';
 
@@ -25,18 +23,14 @@ const FloatingText = ({ text, delay = 0 }) => {
 export default function BirthdayMessage({ onComplete }) {
   const [step, setStep] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [play] = useSound(birthdaySound, { volume: 0.7 });
   const name = "Tri Pratiwi Muchlis";
   const birthDate = "11 Mei 2006";
 
   useEffect(() => {
     const timer = setTimeout(() => {
       if (step === 0) {
-        play();
-        setTimeout(() => {
-          setShowConfetti(true);
-          setTimeout(() => setShowConfetti(false), 10000);
-        }, 1);
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 10000);
       }
       if (step < 4) {
         setStep(step + 1);
@@ -48,7 +42,7 @@ export default function BirthdayMessage({ onComplete }) {
       }
     }, 2000);
     return () => clearTimeout(timer);
-  }, [step, play, onComplete]);
+  }, [step, onComplete]);
 
   return (
   <div className="fixed inset-0 bg-black overflow-hidden w-screen h-screen">
@@ -57,7 +51,6 @@ export default function BirthdayMessage({ onComplete }) {
       <Confetti 
         width={window.innerWidth}
         height={window.innerHeight}
-        // ... (config lainnya tetap sama)
       />
     )}
     
@@ -145,114 +138,3 @@ export default function BirthdayMessage({ onComplete }) {
     </div>
   );
 }
-
-
-
-// import { useState, useEffect } from 'react';
-// import useSound from 'use-sound';
-// import birthdaySound from '../assets/sounds/birthday.mp3';
-// import FallingText from './FallingText';
-
-// const FallingLetter = ({ letter, index, color }) => {
-//   const left = 10 + (index * 8) + (Math.random() * 5);
-//   const delay = index * 0.2;
-//   const duration = 1 + (Math.random() * 0.5);
-  
-//   return (
-//     <span
-//       className={`absolute text-6xl font-bold ${color} opacity-0`}
-//       style={{
-//         left: `${left}%`,
-//         top: '-100px',
-//         animation: `fall ${duration}s ease-out ${delay}s forwards, fadeIn 0.5s ease-out ${delay}s forwards`,
-//         textShadow: '0 0 10px currentColor, 0 0 20px currentColor',
-//         zIndex: 10
-//       }}
-//     >
-//       {letter}
-//     </span>
-//   );
-// };
-
-// export default function BirthdayMessage({ onComplete }) {
-//   const [step, setStep] = useState(0);
-//   const [play] = useSound(birthdaySound, { volume: 0.7 });
-//   const name = "Your Girlfriend's Name";
-//   const birthDate = "January 1, 2003";
-
-//   useEffect(() => {
-//     const timer = setTimeout(() => {
-//       if (step === 0) {
-//         play();
-//       }
-//       if (step < 4) {
-//         setStep(step + 1);
-//       }
-//       if (step === 4) {
-//         // Wait 10 seconds before proceeding to main menu
-//         setTimeout(() => {
-//           onComplete();
-//         }, 10000);
-//       }
-//     }, 2000);
-//     return () => clearTimeout(timer);
-//   }, [step, play, onComplete]);
-
-//   return (
-//     <div className="relative overflow-hidden min-h-screen flex items-center justify-center bg-black">
-//       {/* Background falling text with neon pink and white colors */}
-//       <FallingText colors={['#ff00ff', '#ffffff']} />
-      
-//       {/* Falling "Happy Birthday" letters */}
-//       {step === 0 && "Happy Birthday".split('').map((letter, i) => (
-//         <FallingLetter 
-//           key={i} 
-//           letter={letter} 
-//           index={i}
-//           color={i % 2 === 0 ? 'text-pink-400' : 'text-white'}
-//         />
-//       ))}
-
-//       {/* Name */}
-//       {step >= 1 && (
-//         <div className={`relative z-20 text-center px-4 ${step === 1 ? 'animate-bounceIn' : ''}`}>
-//           <h2 className="text-5xl md:text-7xl font-bold text-pink-400 mb-6 neon-text-pink">
-//             {name}
-//           </h2>
-//         </div>
-//       )}
-
-//       {/* Birth Date */}
-//       {step >= 2 && (
-//         <div className={`relative z-20 text-center px-4 ${step === 2 ? 'animate-fadeInUp' : ''}`}>
-//           <p className="text-3xl text-white mb-8 neon-text-white">
-//             {birthDate}
-//           </p>
-//         </div>
-//       )}
-
-//       {/* Age */}
-//       {step >= 3 && (
-//         <div className={`relative z-20 text-center px-4 ${step === 3 ? 'animate-pulse' : ''}`}>
-//           <div className="text-6xl font-bold text-pink-400 mb-8 neon-text-pink">
-//             Happy 20!
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Message */}
-//       {step >= 4 && (
-//         <div className={`relative z-20 max-w-2xl mx-auto p-6 bg-black bg-opacity-70 backdrop-blur-sm rounded-xl border border-pink-400 border-opacity-50 ${
-//           step === 4 ? 'animate-fadeIn' : ''
-//         }`}>
-//           <p className="text-xl text-white">
-//             To the most amazing woman in my life, may your birthday be as beautiful as you are. 
-//             Every moment with you feels like a dream come true. I pray for your happiness, health, 
-//             and success in everything you do. You deserve all the love in the universe. 
-//             I love you more than words can express. ❤️
-//           </p>
-//         </div>
-//       )}
-//     </div>
-//  );
-// }
