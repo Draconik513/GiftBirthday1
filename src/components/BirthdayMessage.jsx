@@ -96,14 +96,21 @@ export default function BirthdayMessage({ onComplete }) {
           <div className={`relative z-20 w-full max-w-2xl mx-auto p-4 md:p-6 mb-8 bg-black bg-opacity-70 backdrop-blur-sm rounded-xl border border-pink-400 border-opacity-50 ${
             step === 4 ? 'animate-fadeIn' : ''
           }`}>
-            <p className="text-base md:text-xl text-white leading-relaxed">
-              To the most amazing woman in my life, may your birthday be as beautiful as you are. 
-              Every moment with you feels like a dream come true. I pray for your happiness, health, 
-              and success in everything you do. You deserve all the love in the universe. 
-              I love you more than words can express. love uu sayang❤️                    
-              
-                                                          "Tederness" by Bensound - www.bensound.com
-            </p>
+           <p className="text-base md:text-xl text-white leading-relaxed">
+    To the most amazing woman in my life, may your birthday be as beautiful as you are. 
+    Every moment with you feels like a dream come true. I pray for your happiness, health, 
+    and success in everything you do. You deserve all the love in the universe. 
+    I love you more than words can express. love uu sayang❤️
+  </p>
+
+  {/* Spasi kosong untuk baris baru */}
+  <br />
+  <br />
+
+  {/* Kredit lagu di pojok kanan */}
+  <div className="absolute right-0 bottom-0 text-xs text-gray-300 pr-2 pb-2">
+    "Tenderness" by Bensound – <a href="https://www.bensound.com" target="_blank" rel="noopener noreferrer" className="underline">www.bensound.com</a>
+  </div>
           </div>
         )}
       </div>
