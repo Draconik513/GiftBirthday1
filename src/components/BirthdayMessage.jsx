@@ -19,7 +19,6 @@ const FloatingText = ({ text, delay = 0 }) => {
     </div>  
   );
 };
-
 export default function BirthdayMessage({ onComplete }) {
   const [step, setStep] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -45,22 +44,27 @@ export default function BirthdayMessage({ onComplete }) {
   }, [step, onComplete]);
 
   return (
-  <div className="fixed inset-0 bg-black overflow-hidden w-screen h-screen">
-    {/* Confetti */}
-    {showConfetti && (
-      <Confetti 
-        width={window.innerWidth}
-        height={window.innerHeight}
-      />
-    )}
-    
-    {/* Background Falling Text */}
-    <div className="fixed inset-0 z-0 overflow-hidden">
-      <FallingText colors={['#ff00ff', '#ffffff']} />
-    </div>
+    <div className="fixed inset-0 bg-black overflow-hidden w-screen h-screen">
+      {/* Confetti */}
+      {showConfetti && (
+        <Confetti 
+          width={window.innerWidth}
+          height={window.innerHeight}
+        />
+      )}
+      
+      {/* Background Falling Text */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <FallingText colors={['#ff00ff', '#ffffff']} />
+      </div>
 
-    {/* Konten Utama */}
-    <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-4 overflow-y-auto">
+      {/* === Kredit Lagu di Pojok Kanan Atas === */}
+      <div className="fixed top-2 right-4 z-50 text-xs text-gray-300 bg-black bg-opacity-50 px-2 py-1 rounded">
+        "Tenderness" by Bensound – <a href="https://www.bensound.com" target="_blank" rel="noopener noreferrer" className="underline">www.bensound.com</a>
+      </div>
+
+      {/* Konten Utama */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-4 overflow-y-auto">
         {step === 0 && (
           <>
             <FloatingText text="Happy Birthday" delay={0} />
@@ -96,21 +100,12 @@ export default function BirthdayMessage({ onComplete }) {
           <div className={`relative z-20 w-full max-w-2xl mx-auto p-4 md:p-6 mb-8 bg-black bg-opacity-70 backdrop-blur-sm rounded-xl border border-pink-400 border-opacity-50 ${
             step === 4 ? 'animate-fadeIn' : ''
           }`}>
-           <p className="text-base md:text-xl text-white leading-relaxed">
-    To the most amazing woman in my life, may your birthday be as beautiful as you are. 
-    Every moment with you feels like a dream come true. I pray for your happiness, health, 
-    and success in everything you do. You deserve all the love in the universe. 
-    I love you more than words can express. love uu sayang❤️
-  </p>
-
-  {/* Spasi kosong untuk baris baru */}
-  <br />
-  <br />
-
-  {/* Kredit lagu di pojok kanan */}
-  <div className="absolute right-0 bottom-0 text-xs text-gray-300 pr-2 pb-2">
-    "Tenderness" by Bensound – <a href="https://www.bensound.com" target="_blank" rel="noopener noreferrer" className="underline">www.bensound.com</a>
-  </div>
+            <p className="text-base md:text-xl text-white leading-relaxed">
+              To the most amazing woman in my life, may your birthday be as beautiful as you are. 
+              Every moment with you feels like a dream come true. I pray for your happiness, health, 
+              and success in everything you do. You deserve all the love in the universe. 
+              I love you more than words can express. love uu sayang❤️
+            </p>
           </div>
         )}
       </div>
@@ -121,7 +116,7 @@ export default function BirthdayMessage({ onComplete }) {
           70% { opacity: 1; transform: scale(1.1); }
           100% { opacity: 0; transform: scale(0.9); }
         }
-        
+
         .neon-text {
           text-shadow: 
             0 0 5px #ff00ff,
@@ -130,7 +125,7 @@ export default function BirthdayMessage({ onComplete }) {
             0 0 40px #ff00ff;
           animation: neon-flicker 1.5s infinite alternate;
         }
-        
+
         @keyframes neon-flicker {
           0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
             text-shadow:
