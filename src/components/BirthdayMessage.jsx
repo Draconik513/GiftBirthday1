@@ -23,7 +23,7 @@ const FloatingText = ({ text, delay = 0 }) => {
 export default function BirthdayMessage({ onComplete }) {
   const [step, setStep] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
-  const name = "Tri Pratiwi Muchlis";
+  const name = "Laura";
   const birthDate = "11 Mei 2006";
 
   useEffect(() => {
